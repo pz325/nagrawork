@@ -1,6 +1,6 @@
 import re
 
-logFile = r'C:\Users\zou\Desktop\tmp\logs\multiaudio_37.fail.log'
+logFile = r'C:\Users\zou\Desktop\tmp\logs\multiaudio_38.fail.log'
 
 
 def plainTextChecker(line, pattern, info):
@@ -70,10 +70,10 @@ def seek(line):
 
 
 def setAudioTrack(line):
-    pattern = 'ABSE::Source::setAudioTrack\(ABSE::MediaMetadata\*, bool\) New audio playlist for (.*)/(.*\.m3u8) at sequence (-?\d*)'
-    match = re.search(pattern, line)
-    if match:
-        return True, 'setAudioTrack to {ts} at {seq}'.format(ts=match.group(2), seq=match.group(3))
+    pattern1 = 'ABSE::Source::setAudioTrack\(ABSE::MediaMetadata\*, bool\) New|Set audio playlist for|to (.*)/(.*\.m3u8) at sequence (-?\d*)'
+    match1 = re.search(pattern1, line)
+    if match1:
+        return True, 'setAudioTrack to {ts} at {seq}'.format(ts=match1.group(2), seq=match1.group(3))
     else:
         return False, ''
 
