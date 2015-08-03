@@ -1,6 +1,6 @@
 import re
 
-logFile = 'multiaudio_37.fail.log'
+logFile = r'C:\Users\zou\Desktop\tmp\logs\multiaudio_37.fail.log'
 
 
 def plainTextChecker(line, pattern, info):
@@ -20,7 +20,7 @@ def detectProgramEnter(line):
 def detectProgramLeave(line):
     return plainTextChecker(line,
         'NMPMcMp2Demuxer::detectPrograms\(\) Leave',
-        'detectProgram')
+        'detectProgram leave')
 
 
 def handleDiscontinuityEnter(line):
@@ -110,7 +110,7 @@ def test(filename):
 def analyse(filename):
     # list of checkers
     checkers = [bufferRead, 
-        detectProgramLeave, 
+        detectProgramEnter, 
         handleDiscontinuityEnter, 
         handleDiscontinuityLive,
         readout,
@@ -121,7 +121,7 @@ def analyse(filename):
         audioStreamSequence]
     
     # how to join info
-    toMerge = [detectProgramLeave, readout, discontinuityDetected]
+    toMerge = [detectProgramEnter, readout, discontinuityDetected]
     lineNum = 0
     infoToMerge = []
     for l in open(filename):
