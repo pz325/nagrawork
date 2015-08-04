@@ -1,6 +1,6 @@
 import re
 
-logFile = r'C:\Users\zou\Desktop\tmp\logs\multiaudio_38.fail.log'
+logFile = r'C:\Users\zou\Desktop\tmp\logs\multiaudio_38.fail.259964.log'
 
 
 def plainTextChecker(line, pattern, info):
@@ -43,10 +43,10 @@ def discontinuityDetected(line):
 
 
 def bufferRead(line):
-    pattern = 'ABSE::Buffer::read\(uint32_t, uint8_t\*, bool&\) Leave : length of data read == (\d*)'
+    pattern = 'ABSE::Buffer::read\(uint32_t, uint8_t\*, bool&\) Leave : length of data read == (\d*) at sequence: (\d*)'
     match = re.search(pattern, line)
     if match:
-        return True, 'read\t\t{bytesRead}'.format(bytesRead=match.group(1))
+        return True, 'read\t\t{bytesRead} at {seq}'.format(bytesRead=match.group(1), seq=match.group(2))
     else:
         return False, ''
 
@@ -70,10 +70,11 @@ def seek(line):
 
 
 def setAudioTrack(line):
-    pattern1 = 'ABSE::Source::setAudioTrack\(ABSE::MediaMetadata\*, bool\) New|Set audio playlist for|to (.*)/(.*\.m3u8) at sequence (-?\d*)'
-    match1 = re.search(pattern1, line)
-    if match1:
-        return True, 'setAudioTrack to {ts} at {seq}'.format(ts=match1.group(2), seq=match1.group(3))
+    # pattern = 'ABSE::Source::setAudioTrack\(ABSE::MediaMetadata\*, bool\) (.*)'
+    pattern = 'ABSE::Source::setAudioTrack\(ABSE::MediaMetadata\*, bool\) (.*)/(.*\.m3u8) at sequence (-?\d*)'
+    match = re.search(pattern, line)
+    if match:
+        return True, 'setAudioTrack to {m3u8} at {seq}'.format(m3u8=match.group(2), seq=match.group(3))
     else:
         return False, ''
 
@@ -122,6 +123,7 @@ def analyse(filename):
     
     # how to join info
     toMerge = [detectProgramEnter, readout, discontinuityDetected]
+    toMerge = []
     lineNum = 0
     infoToMerge = []
     for l in open(filename):
