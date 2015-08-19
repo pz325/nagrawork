@@ -1,6 +1,7 @@
 import re
 
 logFile = r'C:\Users\zou\Desktop\tmp\logs\multiaudio_38.fail.259964.log'
+logFile = r'C:\Users\zou\Desktop\tmp\logs\tmp.log'
 
 
 def plainTextChecker(line, pattern, info):
@@ -37,7 +38,8 @@ def handleDiscontinuityLive(line):
 
 def discontinuityDetected(line):
     return plainTextChecker(line,
-        'bool ABSE::Buffer::checkDiscontinuityBySeq\(uint64_t, uint64_t\) DISCONTINUITY detected while checking',
+        # 'bool ABSE::Buffer::checkDiscontinuityBySeq\(uint64_t, uint64_t\) DISCONTINUITY detected while checking',
+        'ABSE::Source::read\(uint32_t, uint8_t\*, bool&, TNMPTrackType\) Detect discontinuity after read',
         'D')
 
 
@@ -97,6 +99,15 @@ def audioStreamSequence(line):
         return False, ''
 
 
+def requestOperation(line):
+    pattern = 'Got a valid (\w*) request via requestOperation'
+    match = re.search(pattern, line)
+    if match:
+        return True, 'requestOperation {opt}'.format(opt=match.group(1))
+    else:
+        return False, ''
+
+
 def test(filename):
     checker = setAudioTrack
     lineNum = 0
@@ -119,8 +130,10 @@ def analyse(filename):
         seek,
         setAudioTrack,
         videoStreamSequence,
-        audioStreamSequence]
-    
+        audioStreamSequence,
+        requestOperation
+    ]
+
     # how to join info
     toMerge = [detectProgramEnter, readout, discontinuityDetected]
     toMerge = []
